@@ -1,5 +1,8 @@
 <template>
-  <div id="app">项目开始</div>
+  <div id="app">
+     <router-view></router-view>
+  </div>
+ 
 </template>
 
 <script>
