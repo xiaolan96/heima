@@ -10,7 +10,7 @@
           <el-input v-model="loginForm.password" placeholder="密码" prefix-icon="myicon myicon-key"></el-input>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" class="login-btn">登陆</el-button>
+          <el-button type="primary" class="login-btn" @click="login">登陆</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -18,12 +18,13 @@
 </template>
 
 <script>
+import { login } from "@/api/user_index.js";
 export default {
   data() {
     return {
       loginForm: {
-        username: "",
-        password: ""
+        username: "admin",
+        password: "123456"
       },
       rules: {
         username: [
@@ -32,6 +33,40 @@ export default {
         password: [{ required: true, message: "请输入密码", trigger: "blur" }]
       }
     };
+  },
+  methods: {
+    login() {
+      // 再次实现数据的验证
+      // 我们可以调用表单的validate方法实现数据的验证，在验证完成的时候，会调用传入的毁掉函数，这个回调函数有一个参数valid，如果这个参数为true，则说明验证通过
+      this.$refs.loginForm.validate(valid => {
+        if (valid) {
+          login(this.loginForm)
+            .then(res => {
+              if (res.data.meta.state === 200) {
+                this.$router.push({ name: "home" });
+              } else {
+                this.$message({
+                  message: res.data.meta.msg,
+                  type: "error"
+                });
+              }
+            })
+            .catch(err => {
+              this.$message({
+                message: "登录失败",
+                type: "error"
+              });
+            });
+        } else {
+          this.$message({
+            message: "数据输入不合法",
+            type: "error"
+          });
+          // 只有return false才能阻止请求
+          return false;
+        }
+      });
+    }
   }
 };
 </script>
