@@ -13,6 +13,15 @@ import "@/styles/index.less";
 import router from "@/router/index.js";
 Vue.config.productionTip = false;
 
+router.beforeEach((to, from, next) => {
+  var token = localStorage.getItem("itcast_manage_34_token");
+  if (token || to.path === "/login") {
+    next();
+  } else {
+    next({ name: "login" });
+  }
+});
+
 new Vue({
   // 注入
   router,

@@ -2,6 +2,8 @@ import Vue from "vue";
 import VueRouter from "vue-router";
 import Login from "@/view/login.vue";
 import Home from "@/view/home.vue";
+import Welcome from "@/view/welcome.vue";
+import Users from "@/view/users/user.vue";
 // 使用
 Vue.use(VueRouter);
 // 创建路由对象
@@ -21,8 +23,25 @@ var router = new VueRouter({
     {
       name: "home",
       path: "/home",
-      component: Home
+      // 添加啊路由从定向
+      redirect: { name: "welcome" },
+      component: Home,
+      // 添加嵌套路由
+      children: [
+        {
+          name: "welcome",
+          path: "welcome",
+
+          component: Welcome
+        },
+        {
+          name: "users",
+          path: "users",
+          component: Users
+        }
+      ]
     }
   ]
 });
+// 暴露
 export default router;

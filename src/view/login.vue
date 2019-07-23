@@ -42,7 +42,14 @@ export default {
         if (valid) {
           login(this.loginForm)
             .then(res => {
-              if (res.data.meta.state === 200) {
+              console.log(res);
+              if (res.data.meta.status === 200) {
+                // 路由跳转之后先保存token数据到本地存储
+                localStorage.setItem(
+                  "itcast_manage_34_token",
+                  res.data.data.token
+                );
+                // 进行路由跳转
                 this.$router.push({ name: "home" });
               } else {
                 this.$message({
