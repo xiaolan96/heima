@@ -56,9 +56,11 @@ export const updateUserState = (uid, type) => {
   });
 };
 
-// 分配角色
-export const getAllRoleList = () => {
+// 分配用户角色
+export const grantUserRole = data => {
   return axios({
-    url: "roles"
+    url: `users/${data.id}/role`,
+    method: "put",
+    data: { rid: data.rid }
   });
 };

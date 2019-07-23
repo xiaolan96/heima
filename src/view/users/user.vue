@@ -41,7 +41,7 @@
             <el-button type="primary" icon="el-icon-edit" @click="showEditDialog(scope.row)"></el-button>
           </el-tooltip>
           <el-tooltip class="item" effect="dark" content="分配角色" placement="top">
-            <el-button type="primary" icon="el-icon-d-caret"></el-button>
+            <el-button type="primary" icon="el-icon-d-caret" @click="showGrantDialog(scope.row)"></el-button>
           </el-tooltip>
           <el-tooltip class="item" effect="dark" content="删除" placement="top">
             <el-button type="primary" icon="el-icon-delete" @click="del(scope.row.id)"></el-button>
@@ -98,17 +98,28 @@
         <el-button type="primary" @click="editsubmit">确 定</el-button>
       </div>
     </el-dialog>
-    <el-dialog title="收货地址" :visible.sync="dialogFormVisible">
-  <el-form :model="form">
-    <el-form-item label="活动名称" :label-width="formLabelWidth">
-      <el-input v-model="form.name" auto-complete="off"></el-input>
-    </el-form-item>
-  </el-form>
-  <div slot="footer" class="dialog-footer">
-    <el-button @click="dialogFormVisible = false">取 消</el-button>
-    <el-button type="primary" >确 定</el-button>
-  </div>
-</el-dialog>
+    <!-- 分配角色 -->
+    <el-dialog title="分配角色" :visible.sync="grantdialogFormVisible">
+      <el-form :model="grantform" :label-width="'80px'">
+        <el-form-item label="用户名:">
+          <span>{{grantform.username}}</span>
+        </el-form-item>
+        <el-form-item label="角色:">
+          <el-select v-model="grantform.rid" clearable placeholder="请选择">
+            <el-option
+              v-for="item in roleList"
+              :key="item.id"
+              :label="item.roleName"
+              :value="item.id"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="grantdialogFormVisible = false">取 消</el-button>
+        <el-button type="primary" @click="grantrole">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -119,12 +130,21 @@ import {
   editUser,
   delUserById,
   updateUserState,
-  getAllRoleList
+  grantUserRole
 } from "@/api/user_index.js";
+import { getAllRoleList } from "@/api/role_index.js";
 import { log } from "util";
 export default {
   data() {
     return {
+      // 分配角色
+      roleList: [],
+      grantform: {
+        id: "",
+        username: "",
+        rid: ""
+      },
+      grantdialogFormVisible: false,
       // 编辑
       editdialogFormVisible: false,
       editform: {
@@ -177,6 +197,39 @@ export default {
     };
   },
   methods: {
+    // 展示分配角色对话框
+    showGrantDialog(row) {
+      this.grantdialogFormVisible = true;
+      this.grantform.id = row.id;
+      this.grantform.username = row.username;
+      this.grantform.rid = row.rid;
+    },
+    // 分配角色
+    async grantrole() {
+      if (!this.grantform.rid) {
+        this.$message({
+          type: "waining",
+          message: "请选择一个角色"
+        });
+      } else {
+        let res = await grantUserRole(this.grantform);
+        if (res.data.meta.status === 200) {
+          console.log(res);
+
+          this.$message({
+            type: "success",
+            message: "角色设置成功"
+          });
+          this.grantdialogFormVisible = false;
+          this.init();
+        }
+      }
+    },
+    // 获取所有角色数据
+    async roleListInit() {
+      let res = await getAllRoleList();
+      this.roleList = res.data.data;
+    },
     // 修改用户状态
     async changeState(id, type) {
       let res = await updateUserState(id, type);
@@ -199,7 +252,7 @@ export default {
           delUserById(id)
             .then(res2 => {
               if (res2.data.meta.status === 200) {
-                console.log(res2);
+                // console.log(res2);
 
                 this.$message({
                   type: "success",
@@ -310,7 +363,7 @@ export default {
     init() {
       getAllUserlist(this.userobj)
         .then(res => {
-          console.log(res);
+          // console.log(res);
 
           if (res.data.meta.status === 200) {
             this.userList = res.data.data.users;
@@ -325,6 +378,7 @@ export default {
   },
   mounted() {
     this.init();
+    this.roleListInit();
   }
 };
 </script>
