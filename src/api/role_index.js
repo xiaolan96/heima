@@ -6,3 +6,10 @@ export const getAllRoleList = () => {
     url: "roles"
   });
 };
+
+export const delRightByRoleId = (roleId, rightId) => {
+  return axios({
+    url: `roles/${roleId}/rights/${rightId}`,
+    method: "delete"
+  });
+};
