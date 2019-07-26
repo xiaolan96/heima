@@ -28,7 +28,7 @@
       <el-table-column label="用户状态" width="100">
         <template slot-scope="scope">
           <el-switch
-            v-model="scope.row.msg_state"
+            v-model="scope.row.mg_state"
             active-color="#13ce66"
             inactive-color="#ff4949"
             @change="changeState(scope.row.id,scope.row.mg_state)"
@@ -232,8 +232,11 @@ export default {
     },
     // 修改用户状态
     async changeState(id, type) {
+      console.log(type);
+
       let res = await updateUserState(id, type);
       if (res.data.meta.status === 200) {
+        console.log(res);
         this.$message({
           type: "success",
           message: "状态修改成功"
@@ -328,7 +331,7 @@ export default {
                 // 隐藏对话框
                 this.adddialogFormVisible = false;
                 // 重置表单元素的数据
-                this.$refs.addform.reseFields();
+                this.$refs.addform.resetFields();
                 // 刷新
                 this.init();
               }
